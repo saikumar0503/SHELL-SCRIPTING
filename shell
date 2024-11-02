@@ -1,0 +1,39 @@
+#!bin/bash
+
+echo
+
+#To update the server
+yum update -y
+
+#To upgrade the server
+yum upgrade -y
+
+#To install the java fotr jenkins
+#We need jdk-11 or jdk-17 for the jenkins for use latest version
+sudo yum install java-17-amazon-corretto -y
+
+#To add the repository for jenkins 
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+	
+#To add the GPG(GNU Privacy Guard) key for jenkins 	
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key	
+
+#To upgrade the server 
+sudo yum upgrade -y
+
+#To install the jenkins in the server
+sudo yum install jenkins -y
+
+#To reload the system manage configuration
+sudo systemctl daemon-reload
+
+#To enable jenkins in server
+sudo systemctl enable jenkins
+
+#To start the jenkins 
+sudo systemctl start jenkins
+
+#To see the jenkins password
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
