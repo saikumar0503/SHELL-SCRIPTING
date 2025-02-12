@@ -1,0 +1,83 @@
+#bin/bash
+
+echo
+
+
+# update the package index files.
+sudo apt update
+
+#upgrade all the installed packages  
+sudo apt upgrade -y
+
+#install Docker
+sudo apt install -y docker.io
+
+#enable the docker
+sudo systemctl enable docker
+
+#start the docker
+sudo systemctl start docker
+
+#check the docker status
+sudo systemctl status docker
+
+#To add a user to the docker group, allowing that user to run Docker commands without needing to use sudo each time
+sudo usermod -aG docker $USER
+
+# to install necessary tools and libraries 
+sudo apt install -y apt-transport-https ca-certificates curl
+
+#to update the server
+sudo apt update
+
+#To securely add the Kubernetes package repository key to your system
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+#to add the Kubernetes APT repository to your system's list of package sources
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+#To update the packages
+sudo apt-get update
+
+#to install the core components required to set up and manage a Kubernetes cluster
+sudo apt-get install -y kubelet kubeadm kubectl
+
+#to mark specific packages on hold
+sudo apt-mark hold kubelet kubeadm kubectl
+
+#to load the kernel module named overlay into the Linux kernel
+sudo modprobe overlay
+
+# to load the br_netfilter kernel module into the Linux kernel
+sudo modprobe br_netfilter
+
+#These settings are commonly required when setting up Kubernetes clusters.
+cat <<EOF | sudo tee /etc/sysctl.d/kubernetes.conf
+net.bridge.bridge-nf-call-ip6tables=1
+net.bridge.bridge-nf-call-iptables=1
+net.ipv4.ip_forward=1
+EOF
+
+#to apply changes made to the system's kernel parameters (using sysctl) without needing to reboot the system
+sudo sysctl --system
+
+#disable all swap partitions or swap files on a Linux system
+sudo swapoff -a
+
+#to remove entries related to swap partitions or swap files 
+sudo sed -i '/swap/d' /etc/fstab
+
+#to initialize a Kubernetes control-plane node.
+kubeadm init --pod-network-cidr=10.244.0.0/16
+
+#to set up the Kubernetes configuration for the current user after initializing a Kubernetes cluster with kubeadm init.
+
+ mkdir -p $HOME/.kube
+ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+ 
+#to apply a Kubernetes configuration file (kube-flannel.yml in this case) directly from a remote URL
+
+ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml 
+ 
+ kubectl get nodes
